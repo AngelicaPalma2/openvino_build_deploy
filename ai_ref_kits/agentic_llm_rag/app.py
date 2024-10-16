@@ -143,8 +143,10 @@ def run_app(agent):
 
     def run():
         with gr.Blocks() as demo:
+
             gr.Markdown("# Smart Retail Assistant 🤖: Agentic LLMs with RAG 💭")
             gr.Markdown("Ask me about paint! 🎨")
+
             
             with gr.Row():
                 chat_window = gr.Chatbot(
