@@ -66,7 +66,7 @@ def setup_tools():
 def load_documents(text_example_en_path):
     # Check and download document if not present
     if not text_example_en_path.exists():
-        text_example_en = "https://example.com/test_painting_llm_rag.pdf"  # Replace with valid URL
+        text_example_en = "test_painting_llm_rag.pdf"  # Replace with valid URL
         r = requests.get(text_example_en)
         content = io.BytesIO(r.content)
         with open(text_example_en_path, "wb") as f:
@@ -77,6 +77,15 @@ def load_documents(text_example_en_path):
     index = VectorStoreIndex.from_documents(documents)
     
     return index
+
+#Function to simulate adding items to cart
+def purchase_click(selected_items, current_cart):
+    """simulate the purchase button click by adding items to the cart."""
+    updated_cart = current_cart + selected_items
+    return updated_cart, f"Added {len(selected_items)} items to cart."
+# Custom function to handle reasoning failures
+def custom_handle_reasoning_failure(callback_manager, exception):
+    return "Hmm...I didn't quite that. Could you please rephrase your question to be simpler?"
 
 def run_app(agent):
     class Capturing(list):
@@ -92,6 +101,7 @@ def run_app(agent):
     def _handle_user_message(user_message, history):
         return "", [*history, (user_message, "")]
 
+
     def _generate_response(chat_history, log_history):
         if not isinstance(log_history, list):
             log_history = []
@@ -101,7 +111,10 @@ def run_app(agent):
 
         # Capture the thought process output
         with Capturing() as output:
-            response = agent.stream_chat(chat_history[-1][0])
+            try:
+                response = agent.stream_chat(chat_history[-1][0])
+            except ValueError:
+                response = agent.stream_chat(chat_history[-1][0])
 
         end_thought_time = time.time()
         thought_process_time = end_thought_time - start_thought_time
@@ -138,8 +151,9 @@ def run_app(agent):
         agent.reset()
         return "", [], []  # Reset both chat and logs (initialize log as empty list)
 
-    def purchase_click():
-        return "Items are added to cart."
+    #Function to check the size of the cart
+    def check_cart_size(cart):
+        return len(cart)
 
     def run():
         with gr.Blocks() as demo:
@@ -152,7 +166,7 @@ def run_app(agent):
                 chat_window = gr.Chatbot(
                     label="Paint Purchase Helper",
                     avatar_images=(None, "https://docs.openvino.ai/2024/_static/favicon.ico"),
-		    height=400,  # Adjust height as per your preference
+		            height=400,  # Adjust height as per your preference
                     scale=3  # Set a higher scale value for Chatbot to make it wider
                    #autoscroll=True,  # Enable auto-scrolling for better UX
                 )
@@ -162,8 +176,6 @@ def run_app(agent):
                     interactive=False,
                     scale=1  # Set lower scale to make it narrower than the Chatbot
                 )
-
-            
             with gr.Row():
                 message = gr.Textbox(label="Ask the Paint Expert", scale=4)
                 clear = gr.ClearButton()
@@ -183,18 +195,26 @@ def run_app(agent):
             
             gr.Markdown("------------------------------")
             gr.Markdown("### Purchase items")
+            #Stateful cart to keep track of items
+            cart = gr.State([])
             with gr.Row():
-                gr.Dropdown(
+                items_dropdown = gr.Dropdown(
                     ["Behr Premium Plus", "AwesomeSplash", "TheBrush", "PaintFinish"], 
                     multiselect=True, 
                     label="Items In-Stock", 
                     info="Which items would you like to purchase?"
-                ),
-                purchase = gr.Button(value="Purchase items")
-                purchased_textbox = gr.Textbox()
-                purchase.click(purchase_click, None, purchased_textbox)
-        
-        demo.launch(server_name='10.3.233.70', server_port=8694, share=True)
+                )
+                purchase = gr.Button(value="Add to Cart")
+                cart_size = gr.Number(label="Cart Size")
+                purchased_textbox = gr.Textbox(label="Purchase Action")
+            
+            with gr.Column():
+                #Click event for adding items to cart
+                purchase.click(purchase_click, [items_dropdown, cart], [cart, purchased_textbox])
+                # Button to check cart size
+                gr.Button("Check Cart Size").click(check_cart_size, cart, cart_size)
+        demo.launch()
+        #demo.launch(server_name='10.3.233.70', server_port=8694, share=True)
 
     run()
 
@@ -230,7 +250,12 @@ if __name__ == "__main__":
 
     # Step 5: Initialize the agent with the loaded tools
     nest_asyncio.apply()
-    agent = ReActAgent.from_tools([multiply_tool, divide_tool, vector_tool], llm=llm, verbose=True)
+
+    agent = ReActAgent.from_tools([multiply_tool, divide_tool, vector_tool], 
+                                  llm=llm, 
+                                  max_iterations=10,  # Set your desired max_iterations value
+                                  handle_reasoning_failure_fn=custom_handle_reasoning_failure,
+                                  verbose=True)
 
     # Step 6: Run the app
     run_app(agent)
