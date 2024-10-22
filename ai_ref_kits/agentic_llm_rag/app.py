@@ -15,11 +15,12 @@ from llama_index.core import VectorStoreIndex, Settings
 import requests
 import io
 from io import StringIO
-from create_tools import Math
+from create_tools import Math, Paint_Cost_Calculator
 import sys
 import gradio as gr
 import nest_asyncio
 import logging
+import yaml
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
@@ -60,8 +61,10 @@ def setup_models(llm_model_path, embedding_model_path):
 def setup_tools():
     multiply_tool = FunctionTool.from_defaults(fn=Math.multiply)
     divide_tool = FunctionTool.from_defaults(fn=Math.divide)
-
-    return multiply_tool, divide_tool
+    add_tool = FunctionTool.from_defaults(fn=Math.add)
+    subtract_tool = FunctionTool.from_defaults(fn=Math.add)
+    paint_cost_calculator = FunctionTool.from_defaults(fn=Paint_Cost_Calculator.calc_paint_cost_budget)
+    return multiply_tool, divide_tool, add_tool, subtract_tool, paint_cost_calculator
 
 def load_documents(text_example_en_path):
     # Check and download document if not present
@@ -103,6 +106,7 @@ def run_app(agent):
 
 
     def _generate_response(chat_history, log_history):
+        print("log_history", log_history)
         if not isinstance(log_history, list):
             log_history = []
 
@@ -167,7 +171,7 @@ def run_app(agent):
                     label="Paint Purchase Helper",
                     avatar_images=(None, "https://docs.openvino.ai/2024/_static/favicon.ico"),
 		            height=400,  # Adjust height as per your preference
-                    scale=3  # Set a higher scale value for Chatbot to make it wider
+                    scale=2  # Set a higher scale value for Chatbot to make it wider
                    #autoscroll=True,  # Enable auto-scrolling for better UX
                 )
                 log_window = gr.Code(
@@ -225,6 +229,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--chat_model", type=str, default="model/llama3.1-8B-INT4", help="Path to the chat model directory")
     parser.add_argument("--embedding_model", type=str, default="model/bge-large-FP32", help="Path to the embedding model directory")
+    parser.add_argument("--personality", type=str, default="personality.yaml", help="Path to the YAML file with chatbot personality")
+
     args = parser.parse_args()
 
     # Load models and embedding based on parsed arguments
@@ -234,7 +240,7 @@ if __name__ == "__main__":
     Settings.llm = llm
 
     # Set up tools
-    multiply_tool, divide_tool = setup_tools()
+    multiply_tool, divide_tool, add_tool, subtract_tool, paint_cost_calculator = setup_tools()
     
     # Step 4: Load documents and create the VectorStoreIndex
     text_example_en_path = Path("test_painting_llm_rag.pdf")
@@ -253,7 +259,7 @@ if __name__ == "__main__":
 
     agent = ReActAgent.from_tools([multiply_tool, divide_tool, vector_tool], 
                                   llm=llm, 
-                                  max_iterations=10,  # Set your desired max_iterations value
+                                  max_iterations=10,  # Set a max_iterations value
                                   handle_reasoning_failure_fn=custom_handle_reasoning_failure,
                                   verbose=True)
 
