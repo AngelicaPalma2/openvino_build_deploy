@@ -14,7 +14,7 @@ class Math(object):
         return a / b
     
 class Paint_Cost_Calculator(object):
-    def calc_paint_cost_budget(self, area: int, price_per_gallon: int, add_paint_supply_costs: bool) -> float:
+    def calculate_paint_cost(self, area: int, price_per_gallon: int, add_paint_supply_costs: bool) -> float:
         """Assuming 2 gallons are needed for 400 square feet"""
         gallons_needed = (area / 400) * 2
         total_cost = gallons_needed * price_per_gallon

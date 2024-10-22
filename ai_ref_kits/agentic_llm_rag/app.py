@@ -12,6 +12,7 @@ from llama_index.core.tools import FunctionTool
 from llama_index.core.tools import QueryEngineTool, ToolMetadata
 from llama_index.core import SimpleDirectoryReader
 from llama_index.core import VectorStoreIndex, Settings
+from llama_index.core import PromptTemplate
 import requests
 import io
 from io import StringIO
@@ -63,7 +64,7 @@ def setup_tools():
     divide_tool = FunctionTool.from_defaults(fn=Math.divide)
     add_tool = FunctionTool.from_defaults(fn=Math.add)
     subtract_tool = FunctionTool.from_defaults(fn=Math.add)
-    paint_cost_calculator = FunctionTool.from_defaults(fn=Paint_Cost_Calculator.calc_paint_cost_budget)
+    paint_cost_calculator = FunctionTool.from_defaults(fn=Paint_Cost_Calculator.calculate_paint_cost)
     return multiply_tool, divide_tool, add_tool, subtract_tool, paint_cost_calculator
 
 def load_documents(text_example_en_path):
@@ -158,7 +159,10 @@ def run_app(agent):
     #Function to check the size of the cart
     def check_cart_size(cart):
         return len(cart)
-
+    
+    def upload_file(file):
+        return file
+    
     def run():
         with gr.Blocks() as demo:
 
@@ -182,6 +186,7 @@ def run_app(agent):
                 )
             with gr.Row():
                 message = gr.Textbox(label="Ask the Paint Expert", scale=4)
+                file_uploader_ui = gr.File(label="Upload PDF Guide (RAG)", value="test_painting_llm_rag.pdf", file_types=[".pdf"])
                 clear = gr.ClearButton()
 
             # Ensure that individual components are passed
@@ -196,7 +201,7 @@ def run_app(agent):
                 outputs=[chat_window, log_window],  # Update chatbot and log window
             )
             clear.click(_reset_chat, None, [message, chat_window, log_window])
-            
+
             gr.Markdown("------------------------------")
             gr.Markdown("### Purchase items")
             #Stateful cart to keep track of items
@@ -229,7 +234,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--chat_model", type=str, default="model/llama3.1-8B-INT4", help="Path to the chat model directory")
     parser.add_argument("--embedding_model", type=str, default="model/bge-large-FP32", help="Path to the embedding model directory")
-    parser.add_argument("--personality", type=str, default="personality.yaml", help="Path to the YAML file with chatbot personality")
+    parser.add_argument("--personality", type=str, default="personality.txt", help="Path to the TXT file with chatbot personality")
 
     args = parser.parse_args()
 
@@ -257,11 +262,20 @@ if __name__ == "__main__":
     # Step 5: Initialize the agent with the loaded tools
     nest_asyncio.apply()
 
-    agent = ReActAgent.from_tools([multiply_tool, divide_tool, vector_tool], 
+    # Load agent config
+    personality_file_path = Path(args.personality)
+    with open(personality_file_path) as f:
+        chatbot_config = f.read()
+    
+    react_system_prompt = PromptTemplate(chatbot_config)
+    print("react_system_prompt", react_system_prompt)
+    #Define agent and available tools
+    agent = ReActAgent.from_tools([multiply_tool, divide_tool, add_tool, subtract_tool, paint_cost_calculator, vector_tool], 
                                   llm=llm, 
                                   max_iterations=10,  # Set a max_iterations value
                                   handle_reasoning_failure_fn=custom_handle_reasoning_failure,
                                   verbose=True)
+    agent.update_prompts({"agent_worker:system_prompt": react_system_prompt})
 
     # Step 6: Run the app
     run_app(agent)
