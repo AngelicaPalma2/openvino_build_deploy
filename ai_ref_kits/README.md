@@ -1,8 +1,8 @@
-# Edge AI Reference Kits for OpenVINO™ Toolkit
+# AI Reference Kits for OpenVINO™ Toolkit
 
 [![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_build_deploy/blob/master/LICENSE.txt)
 
-[Edge AI Reference Kits](https://www.intel.com/content/www/us/en/developer/topic-technology/edge-5g/open-potential.html) are fully functioning applications demonstrating deep learning AI use cases. You can leverage these pre-built components and code samples as the basis for solutions in industries like retail, healthcare, manufacturing, and more. Start development of your AI application on top of our kits, or integrate into your existing apps. 
+[AI Reference Kits](https://www.intel.com/content/www/us/en/developer/topic-technology/edge-5g/open-potential.html) are fully functioning applications demonstrating deep learning AI use cases. You can leverage these pre-built components and code samples as the basis for solutions in industries like retail, healthcare, manufacturing, and more. Start development of your AI application on top of our kits, or integrate into your existing apps. 
 
 ## Table of Contents
 
@@ -16,8 +16,6 @@
 	- [🖼️ Multimodal AI Visual Generator](#%EF%B8%8F-multimodal-ai-visual-generator)
 	- [💬 Conversational AI Chatbot](#-conversational-ai-chatbot)
 	- [🛒 AI Insight Agent with RAG](#ai-insight-agent-with-rag)
-- [Future Kits](#future-kits)
-
 - [Troubleshooting and Resources](#troubleshooting-and-resources)
 
 ## Available Kits
@@ -129,9 +127,6 @@ The Conversational AI Chatbot is an open-source, voice-driven chat agent that an
 | Demo                                                   |                                                                                                                                                         |
 
 The AI Insight Agent with RAG uses the OpenVINO™ toolkit to create a streamlined, voice-activated interface that consumers and retail employees can use as a smart, personalized retail assistant. The AI Insight Agent with RAG can perform math, understand instructional documents, and engage in conversations.
-
-## Future Kits
-This is a list of Edge AI Reference kits that are planned or are in development.
 
 ### 🤖 Generative AI
 
