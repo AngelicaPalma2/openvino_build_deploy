@@ -8,34 +8,31 @@
 
 [![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](https://github.com/openvinotoolkit/openvino_build_deploy/blob/master/LICENSE.txt)
 
-The Conversational AI Chatbot is an open-source, voice-driven chat agent that answers spoken questions with meaningful, spoken responses.  It can be configured to respond in any type of scenario or context. This kit demonstrates the AI Chatbot’s capabilities by simulating the experience of talking to a hotel concierge.
-
-Developers can easily integrate and deploy the AI Chatbot for their applications. It harnesses models for speech recognition and text-to-speech (TTS) synthesis. The Chatbot is configured to understand user prompts, engage in meaningful dialogue, and provide spoken, conversational responses. It uses Intel OpenVINO™, which is a toolkit that enables developers to deploy deep learning models on hardware platforms.
-
+The Conversational AI Chatbot is an open-source, voice-driven agent that provides meaningful spoken responses to user questions. Configurable for a wide range of scenarios, this kit demonstrates the chatbot’s capabilities by simulating a conversation with a hotel concierge. Developers can easily integrate and deploy the AI Chatbot into their applications, leveraging models for speech recognition and text-to-speech synthesis. Designed to understand user prompts, engage in meaningful dialogue, and deliver spoken responses, the chatbot utilizes the Intel OpenVINO™ toolkit, enabling seamless deployment of deep learning models across hardware platforms.
 
 This kit uses the following technology stack:
-- [OpenVINO toolkit](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/overview.html) ([Docs](https://docs.openvino.ai/))
-- [Meta’s Llama 3.2](https://llama.meta.com/llama3/)
-- [OpenAI Whisper](https://openai.com/index/whisper/)
+- [OpenVINO Toolkit](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/overview.html) ([docs](https://docs.openvino.ai/))
+- [Llama](https://llama.meta.com/llama3/)
+- [Whisper](https://openai.com/index/whisper/)
 - [MeloTTS](https://github.com/myshell-ai/MeloTTS/tree/main)
-- [Gradio interface](https://www.gradio.app/docs/gradio/chatinterface)
+- [Gradio ChatInterface](https://www.gradio.app/docs/gradio/chatinterface)
 
-For other Intel AI kits, see the [Edge AI Reference Kits repository](/).
+Check out our [AI Reference Kits repository](/) for other kits.
 
 ![conversational-ai-chatbot](https://github.com/user-attachments/assets/262ba878-b845-445b-aff7-0a118517d409)
 
 ### What's New
 
-New updates will be added to this contents list.
+New updates will be added here.
 
 <details open><summary><b>Table of Contents</b></summary>
   
 - [Get Started](#get-started)
-  - [Install Prerequisites](#install-prerequisites)
-  - [Setg Up Your Environment](#set-up-your-environment)
-  - [Get Access to Llama](#get-access-to-llama)
-  - [Convert and Optimize the Model](#convert-and-optimize-the-model)
-  - [Run the Application](#run-the-application-gradio-interface)
+  - [Installing Prerequisites](#install-prerequisites)
+  - [Setting Up Your Environment](#set-up-your-environment)
+  - [Accessing Llama](#get-access-to-llama)
+  - [Converting and Optimizing the Model](#convert-and-optimize-the-model)
+  - [Running the Application](#run-the-application-gradio-interface)
 - [Additional Resources](#additional-resources)
 
 </details>
@@ -56,7 +53,7 @@ sudo apt install git gcc python3-venv python3-dev
 
 _NOTE: If you are using Windows, you might also have to install [Microsoft Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe)._
 
-## Set Up Your Environment
+## Setting Up Your Environment
 
 To set up your environment, you first clone the repository, then create a virtual environment, activate the environment, and install the packages.
 
@@ -118,11 +115,11 @@ To install the other packages, run the following commands:
 pip install -r requirements.txt
 ```
 
-## Get Access to Llama
+## Accessing Llama
 
 _NOTE: If you already have access to the Llama model weights, you can proceed to the authentication step, which is mandatory to convert the Llama model._
 
-## Convert and Optimize the Model
+## Converting and Optimizing the Model
 
 The application uses three separate models. Each model requires conversion and optimization for use with OpenVINO™. The following process includes a step to convert and optimize each model.
 
